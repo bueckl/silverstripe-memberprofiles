@@ -45,7 +45,7 @@ class MemberProfileExtension extends DataExtension {
 		if($value == 'confirm') {
 			$this->owner->NeedsValidation = false;
 		} elseif($value == 'resend') {
-			$email = MemberConfirmationEmail::create($this->owner->ProfilePage(), $this->owner);
+			$email = CustomMemberConfirmationEmail::create($this->owner->ProfilePage(), $this->owner);
 			$email->send();
 		}
 	}
