@@ -762,10 +762,12 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 	 *
 	 * @return Member|null
 	 */
+  /*
 	protected function addMember($form) {
 		$member   = new Member();
-		$groupIds = $this->getSettableGroupIdsFrom($form);
-
+    // $groupIds = $this->getSettableGroupIdsFrom($form);
+    // HARD CODED
+    $groupIds = [3];
 		$form->saveInto($member);
 
 		$member->ProfilePageID   = $this->ID;
@@ -820,7 +822,80 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 		$this->extend('onAddMember', $member);
 		return $member;
 	}
+  */
+  
+  
+	/**
+	 * Attempts to save either a registration or add member form submission
+	 * into a new member object, returning NULL on validation failure.
+	 *
+	 * @return Member|null
+	 */
+	protected function addMember($form) {
 
+		$member   = new Member();
+    // $groupIds = $this->getSettableGroupIdsFrom($form);
+    $groupIds = [3];
+		if ( $form->Fields()->dataFieldByName('CompanyName') && $form->Fields()->dataFieldByName('CompanyName')->value() ) {
+				$CompanyName = $form->Fields()->dataFieldByName('CompanyName')->value();
+				if ($CompanyName != "" ) {
+						$Company = new Company();
+						$Company->CompanyName = $CompanyName;
+						$Company->write();
+						$member->CompanyID = $Company->ID;
+				}
+
+		}
+
+		$form->saveInto($member);
+
+    // HARD CODED !!!!!
+		// $member->ProfilePageID   = $this->ID;
+    // $member->NeedsValidation = ($this->EmailType == 'Validation');
+    // $member->NeedsApproval   = $this->RequireApproval;
+    $member->ProfilePageID   = 47;
+		$member->NeedsValidation = true;
+		$member->NeedsApproval   = true;
+
+		try {
+			$member->write();
+		} catch(ValidationException $e) {
+			$form->sessionMessage($e->getResult()->message(), 'bad');
+			return;
+		}
+
+		// set after member is created otherwise the member object does not exist
+		$member->Groups()->setByIDList($groupIds);
+
+		// If we require admin approval, send an email to the admin and delay
+		// sending an email to the member.
+
+				$email   = new Email();
+				$email->setTo('info@palmasuperyachtshow.com');
+				$email->setBcc('jochenguelden@me.com');
+				$config  = SiteConfig::current_site_config();
+				$approve = Controller::join_links(
+					Director::baseURL(), 'member-approval', $member->ID, '?token=' . $member->ValidationKey
+				);
+
+				$email->setSubject("PSS - Registration Approval Requested");
+				$email->setTemplate('MemberRequiresApprovalEmail');
+
+				$email->populateTemplate(array(
+					'SiteConfig'  => $config,
+					'Member'      => $member,
+					'ApproveLink' => Director::absoluteURL($approve)
+				));
+
+				$email->send();
+      
+
+		$this->extend('onAddMember', $member);
+		return $member;
+	}
+  
+  
+  
 	/**
 	 * @param string $context
 	 * @return FieldSet

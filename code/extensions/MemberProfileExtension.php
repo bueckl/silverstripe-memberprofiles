@@ -65,7 +65,7 @@ class MemberProfileExtension extends DataExtension {
 			$email  = $page->EmailType;
 
 			if ($before == true && $after == false && $email != 'None') {
-				$email = MemberConfirmationEmail::create($page, $this->owner);
+				$email = CustomMemberConfirmationEmail::create($page, $this->owner);
 				$email->send();
 			}
 		}
