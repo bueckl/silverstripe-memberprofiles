@@ -55,6 +55,7 @@ class MemberProfileExtension extends DataExtension {
 	}
 
 	public function onAfterWrite() {
+
 		$changed = $this->owner->getChangedFields();
 
 		if (array_key_exists('NeedsApproval', $changed)) {
@@ -128,5 +129,7 @@ class MemberProfileExtension extends DataExtension {
 			))
 		));
 	}
+
+
 
 }

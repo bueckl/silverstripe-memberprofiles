@@ -11,7 +11,7 @@
  *
  * @package silverstripe-memberprofiles
  */
-class MemberProfilePage extends ClientOrderPage implements PermissionProvider {
+class MemberRegisterPage extends Page implements PermissionProvider {
 
 	private static $db = array (
 		'ProfileTitle'             => 'Varchar(255)',
@@ -375,13 +375,12 @@ class MemberProfilePage extends ClientOrderPage implements PermissionProvider {
 /**
  *
  */
-class MemberProfilePage_Controller extends ClientOrderPage_Controller {
+class MemberRegisterPage_Controller extends Page_Controller {
 
 	private static $allowed_actions = array (
 		'index',
 		'RegisterForm',
 		'afterregistration',
-		'ProfileForm',
 		'add',
 		'AddForm',
 		'confirm',
@@ -504,7 +503,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 			$form->enableSpamProtection( );
 		}
 		$this->extend('updateRegisterForm', $form);
-
+    
 		return $form;
 	}
 
@@ -544,7 +543,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 	 * @return array
 	 */
 	public function afterregistration() {
-
+    
 		return array (
 			'Title'   => $this->obj('AfterRegistrationTitle'),
 			'Content' => $this->obj('AfterRegistrationContent')
@@ -628,7 +627,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 			),
 			new MemberProfileValidator($this->Fields())
 		);
-
+		
 		$this->extend('updateAddForm', $form);
 		return $form;
 	}
@@ -859,10 +858,10 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 			$memberField = $memberFields->dataFieldByName($name);
 
 			// handle the special case of the Groups control so that only allowed groups can be selected
-			// if ($name == 'Groups') {
-			// 	$availableGroups = $this->data()->SelectableGroups()->map('ID', 'Title');
-			// 	$memberField->setSource($availableGroups);
-			// }
+			if ($name == 'Groups') {
+				$availableGroups = $this->data()->SelectableGroups()->map('ID', 'Title');
+				$memberField->setSource($availableGroups);
+			}
 
 			if(!$memberField || $visibility == 'Hidden') continue;
 

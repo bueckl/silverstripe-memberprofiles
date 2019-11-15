@@ -103,6 +103,7 @@ class MemberConfirmationEmail extends Email {
 	 * @return string
 	 */
 	public function getParsedString($string) {
+        
 		$absoluteBaseURL = $this->BaseURL();
 		$variables = array (
 			'$SiteName'       => SiteConfig::current_site_config()->Title,
