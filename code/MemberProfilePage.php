@@ -453,6 +453,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 		}
 
 		$form = $this->ProfileForm();
+
 		$form->loadDataFrom($member);
 
 		if($password = $form->Fields()->fieldByName('Password')) {
@@ -465,6 +466,8 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 				$password->setValue(null);
 			}
 		}
+
+		$password->setRequireExistingPassword(false);
 
 		return array (
 			'Title' => $this->obj('ProfileTitle'),
@@ -559,12 +562,15 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 		$form = new Form (
 			$this,
 			'ProfileForm',
-			$this->getProfileFields('Profile'),
+			$fields = $this->getProfileFields('Profile'),
 			new FieldList(
-				new FormAction('save', _t('MemberProfiles.SAVE', 'Save'))
+				$Action = new FormAction('save', _t('MemberProfiles.SAVE', 'Save'))
 			),
 			new MemberProfileValidator($this->Fields(), Member::currentUser())
 		);
+		$Action->addExtraClass('btn btn-default pull-right');
+		$fields->dataFieldByName('Password')->setRequireExistingPassword(false);
+
 		$this->extend('updateProfileForm', $form);
 		return $form;
 	}
@@ -757,8 +763,8 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 	}
 
 
-  
-  
+
+
 	/**
 	 * Attempts to save either a registration or add member form submission
 	 * into a new member object, returning NULL on validation failure.
@@ -822,14 +828,14 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 				));
 
 				$email->send();
-      
+
 
 		$this->extend('onAddMember', $member);
 		return $member;
 	}
-  
-  
-  
+
+
+
 	/**
 	 * @param string $context
 	 * @return FieldSet
