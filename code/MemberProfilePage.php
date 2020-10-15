@@ -756,6 +756,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 
 		$member->logIn();
 
+		Controller::curr()->redirect('/exhibitors-admin/become-an-exhibitor/');
 		return array (
 			'Title'   => $this->obj('ConfirmationTitle'),
 			'Content' => $this->obj('ConfirmationContent')
@@ -771,7 +772,7 @@ class MemberProfilePage_Controller extends ClientOrderPage_Controller {
 	 *
 	 * @return Member|null
 	 */
-	protected function addMember($form) {
+	public function addMember($form) {
 
 		$member   = new Member();
     // $groupIds = $this->getSettableGroupIdsFrom($form);
